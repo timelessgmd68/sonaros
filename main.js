@@ -1,28 +1,44 @@
 var User = "Sonar.Default/Authority";
-var Users = ["Authority", "Admin", "Guest"];
+var Users = ["Authority", "Admin"];
 var CPUClock = 5800;
 var ScalingFactor = 1;
 var Version = "0.6.0.0";
-var Build = 479;
+var Build = 609;
 var ScalingDivider = ScalingFactor / 1.618;
 var SafeOSMessages = ["Resetting PC....", "Reverting update(s)..", "Updating... (", "Reverting system reset..", "Error 4: Couldn't find OS to reset!", "Error 5: You must be Authority to do this!", "Error 6: This update is not signed.", "Error 7: This update is signed with an expired certificate", "Error 8: You need at least 315MB of scratch disks to do this.", "Error 9: Cannot find the system component_store", "Restoring from point...", "Restore Point taken!"];
 var originalSize = {w: 320, h: 450};
 var CurrentAppElEx = [];
-var wallnum = 1;
+var GuestActive = 0;
 var Apps = [];
 var epassword = "";
 var ThemeName = "Sonar Dark";
 var BackgroundColour = "#00000088";
+var ThemeNum = 0;
 var TextColour = "#FFFFFF";
 var CurrentAppIntName = null;
+var resList = ["320 x 450"];
+var resKeytoWidth = [320];
+var resKeytoHight = [450];
 appendItem(Apps, {"name": "Settings", "displayname":"Settings", "guestcan":false});
 appendItem(Apps, {"name": "Notes", "displayname":"Notes", "guestcan":true});
 appendItem(Apps, {"name": "Calc", "displayname":"Calc", "guestcan":true});
 var RestorePoints = [];
 var Themes = [({"name": "Sonar Dark", "backgrnd":"#00000088", "txt":"#FFFFFF"}), ({"name": "Sonar Light", "backgrnd":"#FFFFFF88", "txt":"#000000"})];
+timedLoop(1000, function() {
+  if (GuestActive) {
+    if (Users.length<2) {
+      appendItem(Users, "Guest");
+    }
+  } else {
+    if (Users.length>2) {
+      removeItem(Users, 2);
+    }
+  }
+});
 function applyTheme(num) {
   ThemeName = Themes[num].name;
   BackgroundColour = Themes[num].backgrnd;
+  ThemeNum = num;
   TextColour = Themes[num].txt;
   deleteElement("Sonar.Frontier.SB");
   deleteElement("Sonar.Frontier.TB");
@@ -143,8 +159,6 @@ function createDialog(title, buttontype, contents, errorcode, type, af) {
   // Window contents
   BEMA.Element("TextArea", af + ".contents", 0, buttonSize, originalSize.w, originalSize.h-buttonSize*2+-5, false, 1, 0, "", BackgroundColour, "rgb(255,255,255)", "", "L", fontSize,"Lucida Console", true, "", "");
   
-  // Window controls
-  BEMA.Element("Button", af + ".close", originalSize.w-buttonSize, 0, buttonSize, buttonSize, false, 1, 0, "", BackgroundColour, TextColour, "⨉", "C", fontSize,"Lucida Console", true, "", "");
 
   if (buttontype==0) {
     BEMA.Element("Button", af + ".b1",38,353, 250, 50, false, 0, 0, BackgroundColour, BackgroundColour, TextColour, "OK", "L", 26, "Lucida Console", true, "", "");
@@ -279,10 +293,12 @@ function Sonar$Settings() {
   BEMA.Element("Button", "Sonar.Settings.About",38,353, 250, 50, false, 0, 0, BackgroundColour, BackgroundColour, TextColour, "About", "L", 26, "Lucida Console", true, "", "");
   BEMA.Element("Button", "Sonar.Settings.Theme",38,293, 250, 50, false, 0, 0, BackgroundColour, BackgroundColour, TextColour, "Themes", "L", 26, "Lucida Console", true, "", "");
   appendItem(CurrentAppElEx,"Sonar.Settings.About");
-  BEMA.Element("Button", "Sonar.Settings.Password",38,233, 250, 50, false, 0, 0, BackgroundColour, BackgroundColour, TextColour, "Passwords", "L", 26, "Lucida Console", true, "", "");
+  BEMA.Element("Button", "Sonar.Settings.Password",38,233, 250, 50, false, 0, 0, BackgroundColour, BackgroundColour, TextColour, "Users", "L", 26, "Lucida Console", true, "", "");
   appendItem(CurrentAppElEx,"Sonar.Settings.Password");
   BEMA.Element("Button", "Sonar.Settings.Wall",38,173, 250, 50, false, 0, 0, BackgroundColour, BackgroundColour, TextColour, "Wallpapers", "L", 26, "Lucida Console", true, "", "");
   appendItem(CurrentAppElEx,"Sonar.Settings.Wall");
+  BEMA.Element("Button", "Sonar.Settings.Dis",38,113, 250, 50, false, 0, 0, BackgroundColour, BackgroundColour, TextColour, "Display", "L", 26, "Lucida Console", true, "", "");
+  appendItem(CurrentAppElEx,"Sonar.Settings.Dis");
   appendItem(CurrentAppElEx,"Sonar.Settings.Theme");
   onEvent("options.close", "click", function( ) {
     for (var i = 0; i <= CurrentAppElEx.length; i++) {
@@ -360,20 +376,62 @@ function Sonar$Settings() {
       Sonar$Settings();
     });
   });
+  onEvent("Sonar.Settings.Dis", "click", function( ) {
+    for (var i = 0; i <= (CurrentAppElEx.length); i++) {
+      i = 0;
+      deleteElement(CurrentAppElEx[i]);
+      removeItem(CurrentAppElEx, 0);
+    }
+    BEMA.Element("TextArea", "Sonar.Settings.Dis.W", 10, 60, 350, 150, false, 0, 0, "transparent", "transparent", TextColour, "Screen res is under \n active testing and \n may fail.", "L", 17, "Lucida Console", true, "", "");
+    appendItem(CurrentAppElEx,"Sonar.Settings.Dis.W");
+    BEMA.Element("Button", "Sonar.Settings.Dis.Back", 30, 350, 100, 50, false, 0, 0, BackgroundColour, BackgroundColour, TextColour, "Back", "L", 26, "Lucida Console", "", "", "");
+    BEMA.Element("Button", "Sonar.Settings.Dis.Apply", 185, 350, 100, 50, false, 0, 0, BackgroundColour, BackgroundColour, TextColour, "Apply", "L", 26, "Lucida Console", "", "", "");
+    BEMA.Element("Dropdown", "Sonar.Settings.Dis.R", 20, 130*ScalingFactor, 270, 35, false, 3, 0, "transparent", BackgroundColour, TextColour, "", "L", 20,"Lucida Console", false, "", "");
+    setProperty("Sonar.Settings.Dis.R", "options", resList);
+    appendItem(CurrentAppElEx,"Sonar.Settings.Dis.Apply");
+    appendItem(CurrentAppElEx,"Sonar.Settings.Dis.R");
+    appendItem(CurrentAppElEx,"Sonar.Settings.Dis.Back");
+    onEvent("Sonar.Settings.Dis.Back", "click", function( ) {
+      for (var i = 0; i <= CurrentAppElEx.length; i++) {
+        i = 0;
+        deleteElement(CurrentAppElEx[i]);
+        removeItem(CurrentAppElEx, 0);
+      }
+      deleteElement("options.title");
+      deleteElement("options.close");
+      deleteElement("options.contents");
+      Sonar$Settings();
+    });
+    onEvent("Sonar.Settings.Dis.Apply", "click", function( ) {
+      originalSize = {w:(resKeytoWidth[(getProperty("Sonar.Settings.Dis.R", "index"))]),h:(resKeytoHight[(getProperty("Sonar.Settings.Dis.R", "index"))])};
+      for (var i = 0; i <= CurrentAppElEx.length; i++) {
+        i = 0;
+        deleteElement(CurrentAppElEx[i]);
+        removeItem(CurrentAppElEx, 0);
+      }
+      deleteElement("options.title");
+      deleteElement("options.close");
+      deleteElement("options.contents");
+      Sonar$Settings();
+      applyTheme(ThemeNum);
+    });
+  });
   onEvent("Sonar.Settings.Password", "click", function( ) {
     for (var i = 0; i <= CurrentAppElEx.length; i++) {
       i = 0;
       deleteElement(CurrentAppElEx[i]);
       removeItem(CurrentAppElEx, 0);
     }
-    BEMA.Element("TextArea", "Sonar.Settings.Passwords.CU", 15, 60, 600, 50, false, 0, 0, "transparent", "transparent", TextColour, "You are logged in as " + UserA, "L", 17, "Lucida Console", true, "", "");
-    appendItem(CurrentAppElEx,"Sonar.Settings.Passwords.CU");
-    BEMA.Element("Button", "Sonar.Settings.Passwords.Apply", 185, 350, 100, 50, false, 0, 0, BackgroundColour, BackgroundColour, TextColour, "Apply", "L", 26, "Lucida Console", "", "", "");
-    appendItem(CurrentAppElEx,"Sonar.Settings.Passwords.Apply");
+    BEMA.Element("Button", "Sonar.Settings.Users.Password",38,163, 250, 50, false, 0, 0, BackgroundColour, BackgroundColour, TextColour, "Passwords", "L", 26, "Lucida Console", true, "", "");
+    BEMA.Switch("Sonar.Settings.Users.GuestActive", 60, 230, BackgroundColour, "#00FF00", !GuestActive);
+    appendItem(CurrentAppElEx,"Sonar.Settings.Users.GuestActive.orb");
+    appendItem(CurrentAppElEx,"Sonar.Settings.Users.GuestActive.bg");
+    appendItem(CurrentAppElEx,"Sonar.Settings.Users.GuestActive");
+    appendItem(CurrentAppElEx,"Sonar.Settings.Users.Password");
+    BEMA.Element("TextArea", "Sonar.Settings.Users.GuestLabel", 130, 230, 350, 150, false, 0, 0, "transparent", "transparent", TextColour, "Show Guest", "L", 17, "Lucida Console", true, "", "");
+    appendItem(CurrentAppElEx,"Sonar.Settings.Users.GuestLabel");
     BEMA.Element("Button", "Sonar.Settings.Passwords.Back", 30, 350, 100, 50, false, 0, 0, BackgroundColour, BackgroundColour, TextColour, "Back", "L", 26, "Lucida Console", "", "", "");
     appendItem(CurrentAppElEx,"Sonar.Settings.Passwords.Back");
-    BEMA.Element("Input", "Sonar.Settings.Passwords.PW", 20, 130*ScalingFactor, 270, 35, false, 3, 0, "transparent", BackgroundColour, TextColour, "Input password", "L", 20,"Lucida Console", false, "", "");
-    appendItem(CurrentAppElEx,"Sonar.Settings.Passwords.PW");
     onEvent("Sonar.Settings.Passwords.Back", "click", function( ) {
       for (var i = 0; i <= CurrentAppElEx.length; i++) {
         i = 0;
@@ -385,17 +443,50 @@ function Sonar$Settings() {
       deleteElement("options.contents");
       Sonar$Settings();
     });
-    onEvent("Sonar.Settings.Passwords.Apply", "click", function( ) {
-      epassword = MWK.sha256(getText("Sonar.Settings.Passwords.PW"));
+    onEvent("Sonar.Settings.Users.GuestActive", "click", function( ) {
+      if (BEMA.getState("Sonar.Settings.Users.GuestActive")) {
+        GuestActive = 0;
+      } else {
+        GuestActive = 1;
+      }
+    });
+    onEvent("Sonar.Settings.Users.Password", "click", function( ) {
       for (var i = 0; i <= CurrentAppElEx.length; i++) {
         i = 0;
         deleteElement(CurrentAppElEx[i]);
         removeItem(CurrentAppElEx, 0);
       }
-      deleteElement("options.title");
-      deleteElement("options.close");
-      deleteElement("options.contents");
-      Sonar$Settings();
+      BEMA.Element("TextArea", "Sonar.Settings.Passwords.CU", 15, 60, 600, 50, false, 0, 0, "transparent", "transparent", TextColour, "You are logged in as " + UserA, "L", 17, "Lucida Console", true, "", "");
+      appendItem(CurrentAppElEx,"Sonar.Settings.Passwords.CU");
+      BEMA.Element("Button", "Sonar.Settings.Passwords.Apply", 185, 350, 100, 50, false, 0, 0, BackgroundColour, BackgroundColour, TextColour, "Apply", "L", 26, "Lucida Console", "", "", "");
+      appendItem(CurrentAppElEx,"Sonar.Settings.Passwords.Apply");
+      BEMA.Element("Button", "Sonar.Settings.Passwords.Back", 30, 350, 100, 50, false, 0, 0, BackgroundColour, BackgroundColour, TextColour, "Back", "L", 26, "Lucida Console", "", "", "");
+      appendItem(CurrentAppElEx,"Sonar.Settings.Passwords.Back");
+      BEMA.Element("Input", "Sonar.Settings.Passwords.PW", 20, 130*ScalingFactor, 270, 35, false, 3, 0, "transparent", BackgroundColour, TextColour, "Input password", "L", 20,"Lucida Console", false, "", "");
+      appendItem(CurrentAppElEx,"Sonar.Settings.Passwords.PW");
+      onEvent("Sonar.Settings.Passwords.Back", "click", function( ) {
+        for (var i = 0; i <= CurrentAppElEx.length; i++) {
+          i = 0;
+          deleteElement(CurrentAppElEx[i]);
+          removeItem(CurrentAppElEx, 0);
+        }
+        deleteElement("options.title");
+        deleteElement("options.close");
+        deleteElement("options.contents");
+        Sonar$Settings();
+      });
+      onEvent("Sonar.Settings.Passwords.Apply", "click", function( ) {
+        epassword = MWK.sha256(getText("Sonar.Settings.Passwords.PW"));
+        for (var i = 0; i <= CurrentAppElEx.length; i++) {
+          i = 0;
+          deleteElement(CurrentAppElEx[i]);
+          removeItem(CurrentAppElEx, 0);
+        }
+        deleteElement("options.title");
+        deleteElement("options.close");
+        deleteElement("options.contents");
+        Sonar$Settings();
+      });
     });
   });
   onEvent("Sonar.Settings.Theme", "click", function( ) {
@@ -403,15 +494,14 @@ function Sonar$Settings() {
   });
 }
 function Sonar$ExtraSettings() {
-  createWindow("Settings", "dev", 100, 100, 100, "", "options", "options");
+  createWindow("Dev Menu", "dev", 100, 100, 100, "", "options", "options");
   CurrentAppIntName = "dev";
-  BEMA.Element("Button", "Sonar.ExtraSettings.Exp1",38,353, 250, 50, false, 0, 0, BackgroundColour, BackgroundColour, TextColour, "Reset this PC", "L", 26, "Lucida Console", true, "", "");
   appendItem(CurrentAppElEx,"Sonar.ExtraSettings.Exp1");
-  appendItem(CurrentAppElEx,"Sonar.ExtraSettings.Exp2");
+  BEMA.Element("Button", "Sonar.ExtraSettings.Exp1",38,353, 250, 50, false, 0, 0, BackgroundColour, BackgroundColour, TextColour, "Reset this PC", "L", 26, "Lucida Console", true, "", "");
   onEvent("dev.close", "click", function( ) {
     for (var i = 0; i <= CurrentAppElEx.length; i++) {
-      i = 0;
       deleteElement(CurrentAppElEx[i]);
+      i = 0;
       removeItem(CurrentAppElEx, 0);
     }
     deleteElement("dev.title");
@@ -466,12 +556,12 @@ function Sonar$Calc() {
     deleteElement("calc.contents");
     CurrentAppIntName = null;
   });
-  BEMA.Element("TextArea", "Sonar.Calc.V1", 20, 75*ScalingFactor, 130, 35, false, 3, 0, "transparent", BackgroundColour, TextColour, "Value 1", "L", 20,"Lucida Console", false, "", "");
-  BEMA.Element("TextArea", "Sonar.Calc.V2", 160, 75*ScalingFactor, 130, 35, false, 3, 0, "transparent", BackgroundColour, TextColour, "Value 2", "L", 20,"Lucida Console", false, "", "");
+  BEMA.Element("TextArea", "Sonar.Calc.V1", 20, 75*ScalingFactor, 130, 35, false, 3, 0, "transparent", BackgroundColour, TextColour, "1", "L", 20,"Lucida Console", false, "", "");
+  BEMA.Element("TextArea", "Sonar.Calc.V2", 160, 75*ScalingFactor, 130, 35, false, 3, 0, "transparent", BackgroundColour, TextColour, "2", "L", 20,"Lucida Console", false, "", "");
   BEMA.Element("Dropdown", "Sonar.Calc.O", 20, 130*ScalingFactor, 270, 35, false, 3, 0, "transparent", BackgroundColour, TextColour, "", "L", 20,"Lucida Console", false, "", "");
+  setProperty("Sonar.Calc.O", "options", ["+","-","*","/", "sqrt", "pow", "rand", "IS greater than", "IS less than"]);
   BEMA.Element("TextArea", "Sonar.Calc.A", 20, 200*ScalingFactor, 270, 35, false, 3, 0, "transparent", BackgroundColour, TextColour, "Answer", "L", 20,"Lucida Console", true, "", "");
   BEMA.Element("Button", "Sonar.Calc.C", 20, 300*ScalingFactor, 270, 35, false, 3, 0, "transparent", BackgroundColour, TextColour, "Calculate", "L", 20,"Lucida Console", true, "", "");
-  setProperty("Sonar.Calc.O", "options", ["+","-","*","/", "sqrt", "pow", "rand", "IS greater than", "IS less than"]);
   appendItem(CurrentAppElEx,"Sonar.Calc.V1");
   appendItem(CurrentAppElEx,"Sonar.Calc.V2");
   appendItem(CurrentAppElEx,"Sonar.Calc.O");
@@ -600,7 +690,7 @@ function openStartMenu() {
     BEMA.Element("Button", "Sonar.Frontier.Shutdown", 160, 333+originalSize.h-407, 25, 25, false, 3, 0, BackgroundColour, BackgroundColour, TextColour, "", "L", 12,"Lucida Console", true, "icon://fa-power-off", TextColour);
         
     for (var i = 0; i < Apps.length; i++) {
-      BEMA.Element("Button", "Sonar.Frontier.App"+i, 15, 160+originalSize.h-450 + 35*i, 190, 25, false, 3, 0, BackgroundColour, BackgroundColour, TextColour, (Apps[i]).name, "L", 12,"Lucida Console", true, "", TextColour);
+      BEMA.Element("Button", "Sonar.Frontier.App"+i, 15, 160+originalSize.h-450 + 35*i, 190, 25, false, 3, 0, BackgroundColour, BackgroundColour, TextColour, (Apps[i]).displayname, "L", 12,"Lucida Console", true, "", TextColour);
     }
     onEvent("Sonar.Frontier.App"+0, "click", function( ) {
         if (startMenuOpen==true) {
@@ -694,7 +784,7 @@ function boot() {
 }
 function recMode() {
   BEMA.Element("TextArea", "Sonar.tmp.01", 00, 00, 999, 999, false, 0, 0, "", "transparent", TextColour, "", "L", 12,"Lucida Console", true, "", "");
-  setText("Sonar.tmp.01", (("Recovery mode loading... \n " + RAMSize) + " double-data-rate (DDR) RAM  \n CPU Clock: ") + CPUClock + " MHz \n Loading system_kernel_resources \n Loading system_locale");
+  setText("Sonar.tmp.01", (("Recovery mode loading... \n " + RAMSize) + " megabytes of RAM  \n CPU Clock: ") + CPUClock + " MHz \n Loading system_kernel_resources \n Loading system_locale");
   setTimeout(function() {
           deleteElement("Sonar.tmp.01");
           User = "Sonar.Recovery/Authority";
@@ -726,6 +816,6 @@ function recMode() {
           });
         }, 40);
 }
-var RAMSize = 8192;
+var RAMSize = 12266;
 var InOS = false;
 MWK.fog("loading..");
