@@ -2,8 +2,8 @@ var User = "Sonar.Default/Authority";
 var Users = ["Authority", "Admin"];
 var CPUClock = 5800;
 var ScalingFactor = 1;
-var Version = "0.6.0.0";
-var Build = 609;
+var Version = "0.7.0.0";
+var Build = 622;
 var ScalingDivider = ScalingFactor / 1.618;
 var SafeOSMessages = ["Resetting PC....", "Reverting update(s)..", "Updating... (", "Reverting system reset..", "Error 4: Couldn't find OS to reset!", "Error 5: You must be Authority to do this!", "Error 6: This update is not signed.", "Error 7: This update is signed with an expired certificate", "Error 8: You need at least 315MB of scratch disks to do this.", "Error 9: Cannot find the system component_store", "Restoring from point...", "Restore Point taken!"];
 var originalSize = {w: 320, h: 450};
@@ -22,6 +22,7 @@ var resKeytoHight = [450];
 appendItem(Apps, {"name": "Settings", "displayname":"Settings", "guestcan":false});
 appendItem(Apps, {"name": "Notes", "displayname":"Notes", "guestcan":true});
 appendItem(Apps, {"name": "Calc", "displayname":"Calc", "guestcan":true});
+appendItem(Apps, {"name": "Music", "displayname":"Music", "guestcan":true});
 var RestorePoints = [];
 var Themes = [({"name": "Sonar Dark", "backgrnd":"#00000088", "txt":"#FFFFFF"}), ({"name": "Sonar Light", "backgrnd":"#FFFFFF88", "txt":"#000000"})];
 timedLoop(1000, function() {
@@ -94,8 +95,6 @@ function SystemResetPC_() {
       deleteElement("Sonar.RecoveryMode.ResetPC");
       deleteElement("Sonar.RecoveryMode.RestorePoints");
       deleteElement("Sonar.RecoveryMode.Continue");
-      deleteElement("Sonar.RecoveryMode.CommandLine");
-      deleteElement("Sonar.RecoveryMode.CommandLine.img");
     }
     BEMA.Element("TextArea", "Sonar.RecoveryMode.ResetPC.Loading", 0, 350, 320, 90, false, 0, 0, "", "transparent", TextColour, SafeOSMessages[0], "Center", 14,"Lucida Console", true, "", "");
     for (var i = 0; i < Apps.length; i++) {
@@ -290,8 +289,8 @@ var UserA = "Authority";
 function Sonar$Settings() {
   createWindow("Settings", "options", 100, 100, 100, "", "options", "options");
   CurrentAppIntName = "options";
-  BEMA.Element("Button", "Sonar.Settings.About",38,353, 250, 50, false, 0, 0, BackgroundColour, BackgroundColour, TextColour, "About", "L", 26, "Lucida Console", true, "", "");
   BEMA.Element("Button", "Sonar.Settings.Theme",38,293, 250, 50, false, 0, 0, BackgroundColour, BackgroundColour, TextColour, "Themes", "L", 26, "Lucida Console", true, "", "");
+  BEMA.Element("Button", "Sonar.Settings.About",38,353, 250, 50, false, 0, 0, BackgroundColour, BackgroundColour, TextColour, "About", "L", 26, "Lucida Console", true, "", "");
   appendItem(CurrentAppElEx,"Sonar.Settings.About");
   BEMA.Element("Button", "Sonar.Settings.Password",38,233, 250, 50, false, 0, 0, BackgroundColour, BackgroundColour, TextColour, "Users", "L", 26, "Lucida Console", true, "", "");
   appendItem(CurrentAppElEx,"Sonar.Settings.Password");
@@ -354,12 +353,12 @@ function Sonar$Settings() {
     }
     BEMA.Element("Image", "Sonar.Settings.Wall.Wall1", 45, 50, 80, 160, false, 0, 0, TextColour, "", "", "", "", "", "", "", "wall1.jpg", "");
     appendItem(CurrentAppElEx,"Sonar.Settings.Wall.Wall1");
-    BEMA.Element("Image", "Sonar.Settings.Wall.Wall2", 145, 50, 80, 160, false, 0, 0, TextColour, "", "", "", "", "", "", "", "https://studio.code.org/v3/assets/IkoRM9VjqBCUjmcxbvLPeYUgx0Ifh7GhDVNKJompHwI/wall2.jpg?t=1739986866000", "");
+    BEMA.Element("Image", "Sonar.Settings.Wall.Wall2", 145, 50, 80, 160, false, 0, 0, TextColour, "", "", "", "", "", "", "", "wall2.jpg", "");
     appendItem(CurrentAppElEx,"Sonar.Settings.Wall.Wall2");
     BEMA.Element("Button", "Sonar.Settings.Wall.Back", 30, 350, 100, 50, false, 0, 0, BackgroundColour, BackgroundColour, TextColour, "Back", "L", 26, "Lucida Console", "", "", "");
     appendItem(CurrentAppElEx,"Sonar.Settings.Wall.Back");
     onEvent("Sonar.Settings.Wall.Wall2", "click", function( ) {
-      setProperty("OS", "image", "https://studio.code.org/v3/assets/IkoRM9VjqBCUjmcxbvLPeYUgx0Ifh7GhDVNKJompHwI/wall2.jpg?t=1739986866000");
+      setProperty("OS", "image", "wall2.jpg");
     });
     onEvent("Sonar.Settings.Wall.Wall1", "click", function( ) {
       setProperty("OS", "image", "wall1.jpg");
@@ -422,7 +421,7 @@ function Sonar$Settings() {
       deleteElement(CurrentAppElEx[i]);
       removeItem(CurrentAppElEx, 0);
     }
-    BEMA.Element("Button", "Sonar.Settings.Users.Password",38,163, 250, 50, false, 0, 0, BackgroundColour, BackgroundColour, TextColour, "Passwords", "L", 26, "Lucida Console", true, "", "");
+    BEMA.Element("Button", "Sonar.Settings.Users.Password",38,143, 250, 50, false, 0, 0, BackgroundColour, BackgroundColour, TextColour, "Passwords", "L", 26, "Lucida Console", true, "", "");
     BEMA.Switch("Sonar.Settings.Users.GuestActive", 60, 230, BackgroundColour, "#00FF00", !GuestActive);
     appendItem(CurrentAppElEx,"Sonar.Settings.Users.GuestActive.orb");
     appendItem(CurrentAppElEx,"Sonar.Settings.Users.GuestActive.bg");
@@ -541,6 +540,54 @@ function Sonar$Notes() {
   });
   BEMA.Element("TextArea", "Sonar.Notes.Note", 0, 30*ScalingFactor, originalSize.w, originalSize.h-60*ScalingFactor, false, 3, 0, "transparent", "transparent", TextColour, "The duck swims on the lake", "L", 15,"Lucida Console", false, "", "");
   appendItem(CurrentAppElEx,"Sonar.Notes.Note");
+}
+function Sonar$Music() {
+  var MusicCurrentlyPlaying = false;
+  var CMusic = null;
+  createWindow("Music", "music");
+  CurrentAppIntName = "music";
+  BEMA.Element("Button", "Sonar.Music.Stop",38,353, 250, 50, false, 0, 0, BackgroundColour, BackgroundColour, TextColour, "Stop", "L", 25, "Lucida Console", true, "", "");
+  appendItem(CurrentAppElEx,"Sonar.Music.Stop");
+  BEMA.Element("Button", "Sonar.Music.000",38,293, 250, 50, false, 0, 0, BackgroundColour, BackgroundColour, TextColour, "2011", "L", 25, "Lucida Console", true, "", "");
+  appendItem(CurrentAppElEx,"Sonar.Music.000");
+  BEMA.Element("Button", "Sonar.Music.001",38,233, 250, 50, false, 0, 0, BackgroundColour, BackgroundColour, TextColour, "10 000", "L", 25, "Lucida Console", true, "", "");
+  appendItem(CurrentAppElEx,"Sonar.Music.001");
+  var Authors = ["ColBreakz"];
+  var GenreKey = ["Dubstep", "House"];
+  var ATS = [0, 0];
+  var GTS = [0, 1];
+  //Author search will be retro-active update to 0.5+ :p
+  //Send to proper fair use policy will be in KB0019
+  //SonarOS Demo will be a halcyon+tidal ra update
+  onEvent("music.close", "click", function( ) {
+    for (var i = 0; i <= CurrentAppElEx.length; i++) {
+      i = 0;
+      deleteElement(CurrentAppElEx[i]);
+      removeItem(CurrentAppElEx, 0);
+    }
+    deleteElement("music.title");
+    deleteElement("music.close");
+    deleteElement("music.contents");
+    CurrentAppIntName = null;
+    CMusic = null;
+    MusicCurrentlyPlaying = false;
+    stopSound();
+  });
+  onEvent("Sonar.Music.Stop", "click", function( ) {
+    CMusic = null;
+    MusicCurrentlyPlaying = false;
+    stopSound();
+  });
+  onEvent("Sonar.Music.000", "click", function( ) {
+    CMusic = "2011";
+    MusicCurrentlyPlaying = true;
+    playSound("song0001.mp3");
+  });
+  onEvent("Sonar.Music.001", "click", function( ) {
+    CMusic = "10 000";
+    MusicCurrentlyPlaying = true;
+    playSound("song0002.mp3");
+  });
 }
 function Sonar$Calc() {
   createWindow("Calc", "calc");
@@ -724,6 +771,19 @@ function openStartMenu() {
         }
         if ((Apps[2]).guestcan) {
           ("Sonar$"+(Apps[2]).name)();
+        } else {
+          if (UserA != "Guest") {
+            StartMenuAppTemp = ("Sonar$"+(Apps[2]).name);
+            getUserPerm_("Settings", StartMenuAppTemp + "()");
+          }
+        }
+      });
+    onEvent("Sonar.Frontier.App"+3, "click", function( ) {
+        if (startMenuOpen==true) {
+          openStartMenu();
+        }
+        if ((Apps[3]).guestcan) {
+          ("Sonar$"+(Apps[3]).name)();
         } else {
           if (UserA != "Guest") {
             StartMenuAppTemp = ("Sonar$"+(Apps[2]).name);
