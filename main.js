@@ -2,8 +2,8 @@ var User = "Sonar.Default/Authority";
 var Users = ["Authority", "Admin"];
 var CPUClock = 5800;
 var ScalingFactor = 1;
-var Version = "0.7.0.0";
-var Build = 622;
+var Version = "0.8.0.0";
+var Build = 635;
 var ScalingDivider = ScalingFactor / 1.618;
 var SafeOSMessages = ["Resetting PC....", "Reverting update(s)..", "Updating... (", "Reverting system reset..", "Error 4: Couldn't find OS to reset!", "Error 5: You must be Authority to do this!", "Error 6: This update is not signed.", "Error 7: This update is signed with an expired certificate", "Error 8: You need at least 315MB of scratch disks to do this.", "Error 9: Cannot find the system component_store", "Restoring from point...", "Restore Point taken!"];
 var originalSize = {w: 320, h: 450};
@@ -14,7 +14,9 @@ var epassword = "";
 var ThemeName = "Sonar Dark";
 var BackgroundColour = "#00000088";
 var ThemeNum = 0;
+var BWidth = 0;
 var TextColour = "#FFFFFF";
+var BordColour = "#FFFFFF";
 var CurrentAppIntName = null;
 var resList = ["320 x 450"];
 var resKeytoWidth = [320];
@@ -24,7 +26,11 @@ appendItem(Apps, {"name": "Notes", "displayname":"Notes", "guestcan":true});
 appendItem(Apps, {"name": "Calc", "displayname":"Calc", "guestcan":true});
 appendItem(Apps, {"name": "Music", "displayname":"Music", "guestcan":true});
 var RestorePoints = [];
-var Themes = [({"name": "Sonar Dark", "backgrnd":"#00000088", "txt":"#FFFFFF"}), ({"name": "Sonar Light", "backgrnd":"#FFFFFF88", "txt":"#000000"})];
+var Themes = [];
+appendItem(Themes, {"name": "Sonar Dark", "backgrnd":"#00000088", "txt":"#FFFFFF", "borderc":"#000000","borderw":0});
+appendItem(Themes, {"name": "Sonar Light", "backgrnd":"#FFFFFF88", "txt":"#000000", "borderc":"#000000","borderw":0});
+appendItem(Themes, {"name": "High Contrast Light", "backgrnd":"#FFFFFF", "txt":"#000000", "borderc":"#000000","borderw":2});
+appendItem(Themes, {"name": "High Contrast Dark", "backgrnd":"#000000", "txt":"#FFFFFF", "borderc":"#FFFFFF","borderw":2});
 timedLoop(1000, function() {
   if (GuestActive) {
     if (Users.length<2) {
@@ -41,6 +47,8 @@ function applyTheme(num) {
   BackgroundColour = Themes[num].backgrnd;
   ThemeNum = num;
   TextColour = Themes[num].txt;
+  BordColour = Themes[num].borderc;
+  BWidth = Themes[num].borderw;
   deleteElement("Sonar.Frontier.SB");
   deleteElement("Sonar.Frontier.TB");
   if (startMenuOpen) {
@@ -62,7 +70,7 @@ function CreateRestorePoint() {
   for (var c = 0; y < Themes.length; c++) {
     appendItem(ThemesF, Themes[c]);
   }
-  appendItem(RestorePoints, {"users": UsersF,themes:ThemesF,themename:ThemeName, "date":"delegate date later", "apps":AppsF, "wallpaper":(getProperty("OS", "image")), "userid":getUserId(), "appconf":Apps, "point":0, "":"", "edition":"", "ver":Version, "app":"", "ip":false, "":""});
+  appendItem(RestorePoints, {"users": UsersF,themes:ThemesF,themename:ThemeName, "date":"delegate date later", "apps":AppsF, "wallpaper":(getProperty("OS", "image")), "userid":getUserId(), "appconf":Apps, "point":BWidth, BordColour:"", "edition":"", "ver":Version, "app":"", "ip":false, "":""});
 }
 function LoadRestorePoint(num) {
   for (var i = 0; i < Apps.length; i++) {
@@ -96,7 +104,7 @@ function SystemResetPC_() {
       deleteElement("Sonar.RecoveryMode.RestorePoints");
       deleteElement("Sonar.RecoveryMode.Continue");
     }
-    BEMA.Element("TextArea", "Sonar.RecoveryMode.ResetPC.Loading", 0, 350, 320, 90, false, 0, 0, "", "transparent", TextColour, SafeOSMessages[0], "Center", 14,"Lucida Console", true, "", "");
+    BEMA.Element("TextArea", "Sonar.RecoveryMode.ResetPC.Loading", 0, 350, 320, 90, false, 0, BWidth, BordColour, "transparent", TextColour, SafeOSMessages[0], "Center", 14,"Lucida Console", true, "", "");
     for (var i = 0; i < Apps.length; i++) {
       removeItem(Apps, 0);
     }
@@ -116,7 +124,7 @@ function SystemResetPC_() {
     appendItem(Apps, {"name": "Settings", "displayname":"Settings", "guestcan":false});
     appendItem(Apps, {"name": "Notes", "displayname":"Notes", "guestcan":true});
   } else {
-    BEMA.Element("TextArea", "Sonar.RecoveryMode.ResetPC.Loading", 0, 350, 320, 90, false, 0, 0, "", "transparent", TextColour, SafeOSMessages[5], "Center", 14,"Lucida Console", true, "", "");
+    BEMA.Element("TextArea", "Sonar.RecoveryMode.ResetPC.Loading", 0, 350, 320, 90, false, 0, BWidth, BordColour, "transparent", TextColour, SafeOSMessages[5], "Center", 14,"Lucida Console", true, "", "");
   }
 }
  
@@ -126,13 +134,13 @@ function createWindow(title, af) {
 
 
   // Title bar
-  BEMA.Element("TextArea", af + ".title", 0, 0, originalSize.w, buttonSize, false, 1, 0, "", BackgroundColour, TextColour, title, "L", fontSize,"Lucida Console", true, "", "");
+  BEMA.Element("TextArea", af + ".title", 0, 0, originalSize.w, buttonSize, false, 1, BWidth, BordColour, BackgroundColour, TextColour, title, "L", fontSize,"Lucida Console", true, "", "");
   
   // Window contents
-  BEMA.Element("TextArea", af + ".contents", 0, buttonSize, originalSize.w, originalSize.h-buttonSize*2+-5, false, 1, 0, "", BackgroundColour, "rgb(255,255,255)", "", "L", fontSize,"Lucida Console", true, "", "");
+  BEMA.Element("TextArea", af + ".contents", 0, buttonSize, originalSize.w, originalSize.h-buttonSize*2+-5, false, 1, BWidth, BordColour, BackgroundColour, "rgb(255,255,255)", "", "L", fontSize,"Lucida Console", true, "", "");
   
   // Window controls
-  BEMA.Element("Button", af + ".close", originalSize.w-buttonSize, 0, buttonSize, buttonSize, false, 1, 0, "", BackgroundColour, TextColour, "⨉", "C", fontSize,"Lucida Console", true, "", "");
+  BEMA.Element("Button", af + ".close", originalSize.w-buttonSize, 0, buttonSize, buttonSize, false, 1, BWidth, BordColour, BackgroundColour, TextColour, "⨉", "C", fontSize,"Lucida Console", true, "", "");
 
 
 }
@@ -153,10 +161,10 @@ function createDialog(title, buttontype, contents, errorcode, type, af) {
   */
   //
   // Title bar
-  BEMA.Element("TextArea", af + ".title", 0, 0, originalSize.w, buttonSize, false, 1, 0, "", BackgroundColour, TextColour, title, "L", fontSize,"Lucida Console", true, "", "");
+  BEMA.Element("TextArea", af + ".title", 0, 0, originalSize.w, buttonSize, false, 1, BWidth, BordColour, BackgroundColour, TextColour, title, "L", fontSize,"Lucida Console", true, "", "");
   
   // Window contents
-  BEMA.Element("TextArea", af + ".contents", 0, buttonSize, originalSize.w, originalSize.h-buttonSize*2+-5, false, 1, 0, "", BackgroundColour, "rgb(255,255,255)", "", "L", fontSize,"Lucida Console", true, "", "");
+  BEMA.Element("TextArea", af + ".contents", 0, buttonSize, originalSize.w, originalSize.h-buttonSize*2+-5, false, 1, BWidth, BordColour, BackgroundColour, "rgb(255,255,255)", "", "L", fontSize,"Lucida Console", true, "", "");
   
 
   if (buttontype==0) {
@@ -287,7 +295,7 @@ function themesMenu() {
 var startMenuOpen = false;
 var UserA = "Authority";
 function Sonar$Settings() {
-  createWindow("Settings", "options", 100, 100, 100, "", "options", "options");
+  createWindow("Settings", "options", 100, 100, 10, BWidth, BordColour, "options", "options");
   CurrentAppIntName = "options";
   BEMA.Element("Button", "Sonar.Settings.Theme",38,293, 250, 50, false, 0, 0, BackgroundColour, BackgroundColour, TextColour, "Themes", "L", 26, "Lucida Console", true, "", "");
   BEMA.Element("Button", "Sonar.Settings.About",38,353, 250, 50, false, 0, 0, BackgroundColour, BackgroundColour, TextColour, "About", "L", 26, "Lucida Console", true, "", "");
@@ -493,7 +501,7 @@ function Sonar$Settings() {
   });
 }
 function Sonar$ExtraSettings() {
-  createWindow("Dev Menu", "dev", 100, 100, 100, "", "options", "options");
+  createWindow("Dev Menu", "dev", 100, 100, 10, BWidth, BordColour, "options", "options");
   CurrentAppIntName = "dev";
   appendItem(CurrentAppElEx,"Sonar.ExtraSettings.Exp1");
   BEMA.Element("Button", "Sonar.ExtraSettings.Exp1",38,353, 250, 50, false, 0, 0, BackgroundColour, BackgroundColour, TextColour, "Reset this PC", "L", 26, "Lucida Console", true, "", "");
@@ -645,7 +653,7 @@ removeItem(UsersL, 0);
 function StartSystem0() {
   InOS = true;
   setProperty("OS", "image", "wall1.jpg");
-  //BEMA.Element("TextArea", "Sonar.Login.Time", 6, 6, 999, 999, false, 0, 0, "", "transparent", TextColour, "00:00:00", "L", 40,"Lucida Console", true, "", "");
+  //BEMA.Element("TextArea", "Sonar.Login.Time", 6, 6, 999, 999, false, 0, BWidth, BordColour, "transparent", TextColour, "00:00:00", "L", 40,"Lucida Console", true, "", "");
   User = "code.org@" +"login";
   UserA = "login";
   BEMA.Element("TextArea", "Sonar.Login.Sheet", 30, 100, 265, 270, false, 10, 0, BackgroundColour, BackgroundColour, TextColour, "\n Log in", "L", 40, "Lucida Console", true, "", "");
@@ -843,18 +851,18 @@ function boot() {
   }, 1000);
 }
 function recMode() {
-  BEMA.Element("TextArea", "Sonar.tmp.01", 00, 00, 999, 999, false, 0, 0, "", "transparent", TextColour, "", "L", 12,"Lucida Console", true, "", "");
+  BEMA.Element("TextArea", "Sonar.tmp.01", 00, 00, 999, 999, false, 0, BWidth, BordColour, "transparent", TextColour, "", "L", 12,"Lucida Console", true, "", "");
   setText("Sonar.tmp.01", (("Recovery mode loading... \n " + RAMSize) + " megabytes of RAM  \n CPU Clock: ") + CPUClock + " MHz \n Loading system_kernel_resources \n Loading system_locale");
   setTimeout(function() {
           deleteElement("Sonar.tmp.01");
           User = "Sonar.Recovery/Authority";
           UserA = "Authority1";
-          BEMA.Element("Image", "Sonar.RecoveryMode.Continue.img", 210, 86, 50, 50, false, 0, 0, "", "transparent", TextColour, "", "L", 14,"Lucida Console", true, "icon://fa-arrow-right", TextColour);
-          BEMA.Element("Image", "Sonar.RecoveryMode.ResetPC.img", 210, 146, 50, 50, false, 0, 0, "", "transparent", TextColour, "", "L", 14,"Lucida Console", true, "icon://fa-refresh", TextColour);
-          BEMA.Element("Image", "Sonar.RecoveryMode.RestorePoints.img", 210, 206, 50, 50, false, 0, 0, "", "transparent", TextColour, "", "L", 14,"Lucida Console", true, "icon://fa-list-alt", TextColour);
-          BEMA.Element("Button", "Sonar.RecoveryMode.ResetPC", 20, 160, 300, 30, false, 0, 0, "", "transparent", TextColour, "Reset this PC", "Left", 14,"Lucida Console", true, "", "");
-          BEMA.Element("Button", "Sonar.RecoveryMode.RestorePoints", 20, 220, 300, 30, false, 0, 0, "", "transparent", TextColour, "Restore Points", "Left", 14,"Lucida Console", true, "", "");
-          BEMA.Element("Button", "Sonar.RecoveryMode.Continue", 20, 100, 300, 30, false, 0, 0, "", "transparent", TextColour, "Continue", "Left", 14,"Lucida Console", true, "", "");
+          BEMA.Element("Image", "Sonar.RecoveryMode.Continue.img", 210, 86, 50, 50, false, 0, BWidth, BordColour, "transparent", TextColour, "", "L", 14,"Lucida Console", true, "icon://fa-arrow-right", TextColour);
+          BEMA.Element("Image", "Sonar.RecoveryMode.ResetPC.img", 210, 146, 50, 50, false, 0, BWidth, BordColour, "transparent", TextColour, "", "L", 14,"Lucida Console", true, "icon://fa-refresh", TextColour);
+          BEMA.Element("Image", "Sonar.RecoveryMode.RestorePoints.img", 210, 206, 50, 50, false, 0, BWidth, BordColour, "transparent", TextColour, "", "L", 14,"Lucida Console", true, "icon://fa-list-alt", TextColour);
+          BEMA.Element("Button", "Sonar.RecoveryMode.ResetPC", 20, 160, 300, 30, false, 0, BWidth, BordColour, "transparent", TextColour, "Reset this PC", "Left", 14,"Lucida Console", true, "", "");
+          BEMA.Element("Button", "Sonar.RecoveryMode.RestorePoints", 20, 220, 300, 30, false, 0, BWidth, BordColour, "transparent", TextColour, "Restore Points", "Left", 14,"Lucida Console", true, "", "");
+          BEMA.Element("Button", "Sonar.RecoveryMode.Continue", 20, 100, 300, 30, false, 0, BWidth, BordColour, "transparent", TextColour, "Continue", "Left", 14,"Lucida Console", true, "", "");
           onEvent("Sonar.RecoveryMode.Continue", "click", function( ) {
             deleteElement("Sonar.RecoveryMode.Continue.img");
             deleteElement("Sonar.RecoveryMode.Continue");
@@ -869,7 +877,7 @@ function recMode() {
           });
           onEvent("Sonar.RecoveryMode.RestorePoints", "click", function( ) {
             CreateRestorePoint();
-            BEMA.Element("TextArea", "Sonar.RecoveryMode.RestorePoint.Done", 0, 350, 320, 90, false, 0, 0, "", "transparent", TextColour, SafeOSMessages[11], "Center", 14,"Lucida Console", true, "", "");
+            BEMA.Element("TextArea", "Sonar.RecoveryMode.RestorePoint.Done", 0, 350, 320, 90, false, 0, BWidth, BordColour, "transparent", TextColour, SafeOSMessages[11], "Center", 14,"Lucida Console", true, "", "");
             setTimeout(function() {
               deleteElement("Sonar.RecoveryMode.RestorePoint.Done");
             }, 1000);
